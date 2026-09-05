@@ -1,0 +1,15 @@
+# Normalize line endings for all text files: stored as LF in git,
+# checked out as LF on Linux/macOS and CRLF on Windows automatically.
+# Prevents noisy whole-file diffs when the Windows and Linux teammates
+# edit the same files.
+* text=auto eol=lf
+
+*.py text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+.gitignore text eol=lf
+
+# Binary data files: never diff, never line-ending-convert these.
+*.mmdb binary
+*.csv binary
+*.graphml binary

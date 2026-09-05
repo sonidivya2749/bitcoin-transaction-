@@ -1,0 +1,39 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# --- Virtual environment ---
+venv/
+.venv/
+env/
+
+# --- Editors ---
+.vscode/
+.idea/
+
+# --- Generated data (reproducible via `python run_pipeline.py`, fixed RANDOM_SEED=42) ---
+# Do not commit: these are regenerated deterministically, no reason to version 200MB+ of output.
+data/clean/*
+data/graph/*
+
+# --- GeoIP: keep the two real databases the pipeline actually reads, ---
+# --- drop the redundant .tar.gz downloads and extracted folders next to them. ---
+data/geoip/*.tar.gz
+data/geoip/GeoLite2-ASN_20260903/
+data/geoip/GeoLite2-City_20260901/
+!data/geoip/GeoLite2-ASN.mmdb
+!data/geoip/GeoLite2-City.mmdb
+
+# --- ground_truth: kept and committed on purpose (see README) ---
+# --- used only for evaluating detection output, never as pipeline/model input. ---
+!data/ground_truth/
+!data/ground_truth/wallet_ground_truth.csv
+
+# --- Test artifacts ---
+.coverage
+
+# --- Working files (not part of the repo) ---
+bitcoin*.zip

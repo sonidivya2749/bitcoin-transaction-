@@ -1,0 +1,37 @@
+# Core
+python-dateutil==2.9.0.post0
+
+
+# Synthetic data generation
+Faker==25.2.0
+
+# Graph
+networkx==3.3
+python-louvain==0.16
+
+# ML
+scikit-learn==1.5.0
+shap==0.45.1
+
+# Dashboard
+streamlit==1.35.0
+plotly==5.22.0
+
+# Geo lookup (offline, needs GeoLite2-City.mmdb downloaded separately)
+geoip2==4.8.0
+
+# Utilities
+pyyaml==6.0.1
+
+python-magic==0.4.27; sys_platform != "win32"
+python-magic-bin==0.4.14; sys_platform == "win32"  # bundles libmagic DLLs for Windows
+
+# Data handling
+pandas==2.2.2
+numpy==1.26.4
+defusedxml==0.7.1
+
+bip_utils==2.12.2
+
+# Testing
+pytest==9.1.1
