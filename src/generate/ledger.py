@@ -345,6 +345,7 @@ def write_ledger_outputs(ledger_df, pools, extra_wallets=None):
     ground_truth_df = pd.DataFrame([
         {
             "wallet_id": w.wallet_id,
+            "address": w.address,
             "scenario": w.scenario,
             "scenario_id": w.scenario_id,
             "role": w.role,
