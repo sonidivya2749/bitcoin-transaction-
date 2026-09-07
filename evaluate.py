@@ -1,21 +1,14 @@
-"""
-Compare model's flagged wallets against ground truth to check real accuracy.
-
-Run from inside the repo folder (after model.py has produced wallet_scores.csv):
-    python step5_evaluate.py
-"""
-
 import pandas as pd
 
 scores = pd.read_csv("wallet_scores.csv")
 truth = pd.read_csv("data/ground_truth/wallet_ground_truth.csv")
 
-# Join on address <-> wallet
+
 merged = scores.merge(truth, left_on="wallet", right_on="address", how="inner")
 
 print(f"Matched {len(merged)} / {len(scores)} scored wallets to ground truth.\n")
 
-# Ground truth: "normal" role = legit, anything else = actually suspicious
+
 merged["actually_suspicious"] = merged["role"] != "normal"
 merged["model_flagged"] = merged["is_anomaly"] == "Yes"
 
