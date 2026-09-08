@@ -1,13 +1,3 @@
-"""
-STEP: Extract per-wallet features from the real ledger data.
-
-Input:  data/clean/ledger.csv
-Output: wallet_features.csv  (one row per wallet address)
-
-Run this from inside the repo folder:
-    python step4_features.py
-"""
-
 import pandas as pd
 import ast
 from datetime import datetime
@@ -16,8 +6,6 @@ print("Loading ledger.csv ...")
 df = pd.read_csv("data/clean/ledger.csv")
 df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-# The address/amount columns are stored as strings that LOOK like Python lists,
-# e.g. "['bc1q...', 'bc1q...']" -- we need to actually parse them into real lists.
 def parse_list(cell):
     try:
         return ast.literal_eval(cell)
@@ -29,10 +17,6 @@ df["input_addresses"] = df["input_addresses"].apply(parse_list)
 df["output_addresses"] = df["output_addresses"].apply(parse_list)
 df["input_amounts"] = df["input_amounts"].apply(parse_list)
 df["output_amounts"] = df["output_amounts"].apply(parse_list)
-
-# --- Build one row per (wallet, transaction, role, amount) ---
-# A wallet can appear as a SENDER (input) or RECEIVER (output) of a transaction.
-# We treat both roles as "activity" for that wallet.
 
 records = []
 

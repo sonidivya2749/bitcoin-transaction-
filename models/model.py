@@ -3,16 +3,16 @@ import pandas as pd
 import joblib
 from sklearn.ensemble import IsolationForest
 
-dummy_data    = False                   #real data ke baad false karna hai isko 
-feature_file  = "wallet_features.csv"   #it is a feature file 
-output_file   = "wallet_scores.csv"     #for explaination and dashboard ke liye
+dummy_data    = False                   
+feature_file  = "wallet_features.csv"   
+output_file   = "wallet_scores.csv"     
 
 
 feature_cols = ["tx_count", "avg_amount", "total_amount", "avg_fee", "avg_time_gap_seconds"]
 Contamination = 0.05  # it is percentage that how much is suspicious
 Random_State = 42
 
-#--------------------------------------------------------------------------------------Now we make fake wallet features for testing, 
+#---------------------Now we make fake wallet features for testing, 
 def make_dummy_features(n_normal=200, n_suspicious=10, seed=42):
     rng = np.random.default_rng(seed)
     
@@ -42,7 +42,7 @@ def make_dummy_features(n_normal=200, n_suspicious=10, seed=42):
     df = df.sample(frac=1, random_state= seed).reset_index(drop=True)                #mixing of suspicious and normal wallets 
     return df
 
-#----------------------------------------------------------------------------------- Checking data is dummy of featured.
+#--------------- Checking data is dummy of featured.
 
 if dummy_data:
     print("We are using dummy data for testing purpose.")
@@ -52,7 +52,7 @@ else:
     df = pd.read_csv(feature_file)
 
 print(f"          Total wallets: {len(df)}")
-#----------------------------------------------------------------------------------safety check (Checking all the columns are in feature file or not.)
+#------------safety check (Checking all the columns are in feature file or not.)
 missing = [c for c in feature_cols if c not in df.columns]
 if missing:
     raise SystemExit(
@@ -61,7 +61,7 @@ if missing:
     )
 
 
-#---------------------------------------------------------------------------------Code for model Training 
+#------------Code for model Training 
 X = df[feature_cols].values
 
 model = IsolationForest(
@@ -71,21 +71,8 @@ model = IsolationForest(
     )
 model.fit(X)
 joblib.dump(model, 'isolation_forest_model.pkl')
-#Note: IsolationForest tree - based hai, isiliye feature scaling
-#(StandardScaler) ki zarurat nhi -- this is very good demo taking point 
-"""
-because : 
-1. Distance-independent logic : Yeh algorithm data points ke beech ka distance (jaise Euclidean distance) calculate nahi karta.
-
-2. Tree-based partitioning: Isolation Forest poore data ko random features aur random split points choose karke partition (divide) karta hai. Yeh har feature ko alag-alag (independently) dekhta hai.
-
-3. Order matters, not magnitude: Tree ko sirf is baat se matlab hota hai ki koi value kisi split point se badi (>) hai ya chhoti (<). Isliye features ka scale chhota ho ya bada, splits ka tareeka aur tree ki depth bilkul same rahegi.
-"""
-#--------------------------------------------------------------------------------Scores
-
-# decision_function: value jitni HIGH = utna normal, negative = anomaly.
-# Hum isko ulta karte hain taaki HIGH score = zyada suspicious.
-
+ 
+#----------------Scores
 raw = -model.decision_function(X)
 
 low, high = raw.min(),raw.max()
