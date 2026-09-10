@@ -1,12 +1,3 @@
-"""
-BlockWatch -- AI-Powered Bitcoin Transaction Monitoring Dashboard
-SIH 2026 -- Problem Statement 26146
-
-
-Run from the dashboard/ folder:
-    streamlit run app.py
-"""
-
 import os
 import time
 import pandas as pd
