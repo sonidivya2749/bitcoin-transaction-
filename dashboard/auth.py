@@ -1,10 +1,3 @@
-"""
-auth.py -- Simple offline authentication for the Streamlit dashboard.
-
-No external services, no internet calls. Users are stored locally in
-users.json with salted+hashed passwords (never plaintext).
-"""
-
 import json
 import hashlib
 import os
