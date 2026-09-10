@@ -1,0 +1,12 @@
+{
+  "deepak@95": {
+    "salt": "43179686f01a9ec069393d003c268f88",
+    "password_hash": "00303eaffc4ede351c729f192ede89ec4096de109e4a08e9f2ea334f6f8239ed",
+    "full_name": "Deepak Kushwaha"
+  },
+  "deepak@official": {
+    "salt": "beeff549aaa355e364a7da5ab89666c3",
+    "password_hash": "28da08b1b60a4a825ba4d6eb7c36e0b9132ff2fdfce4c7fb0ba508792e186927",
+    "full_name": "Deepak Kushwaha"
+  }
+}

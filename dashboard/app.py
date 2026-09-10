@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 import auth
+import pipeline
 
 st.set_page_config(
     page_title="BlockWatch | Bitcoin Transaction Monitor",
@@ -269,7 +270,7 @@ with st.sidebar:
     )
     if "current_page" not in st.session_state:
         st.session_state.current_page = "Overview"
-    nav_options = ["Overview", "Alerts", "Network Graph", "Wallet Explorer"]
+    nav_options = ["Overview", "Alerts", "Network Graph", "Wallet Explorer", "Analyze Data"]
     if "nav_radio" not in st.session_state:
         st.session_state.nav_radio = "Overview"
     st.markdown("<div class='nav-section-label'>DASHBOARDS</div>", unsafe_allow_html=True)
@@ -547,3 +548,60 @@ elif page == "Network Graph":
                                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False), height=560)
             st.plotly_chart(fig, use_container_width=True)
             st.markdown("<span style='color:#FF5C7A;'>&#9679;</span> flagged &nbsp;&nbsp;<span style='color:#3ECF8E;'>&#9679;</span> connected", unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# PAGE: ANALYZE DATA
+# ---------------------------------------------------------------------------
+elif page == "Analyze Data":
+    st.markdown("<div style='font-size:1.5rem;font-weight:800;margin:6px 0 6px 0;'>Analyze Data</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='card-sub' style='margin-bottom:1rem;'>"
+        "Upload a ledger file (CSV, JSON, or XML). Everything below runs fully "
+        "offline on this machine -- no data leaves your computer."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    uploaded = st.file_uploader("Upload transaction ledger", type=["csv", "json", "xml"])
+    model_path = os.path.join(MODELS_DIR, "isolation_forest_model.pkl")
+
+    if uploaded is not None:
+        if st.button("Find Suspicious Wallets", use_container_width=True):
+            if not os.path.exists(model_path):
+                st.error(f"Trained model not found at {model_path}. Run models/model.py first.")
+            else:
+                progress_box = st.status("Running detection pipeline ...", expanded=True)
+
+                def _log(msg):
+                    progress_box.write(msg)
+
+                try:
+                    result_df = pipeline.run_full_pipeline(uploaded, model_path, status_callback=_log)
+                    progress_box.update(label="Detection complete", state="complete")
+                    st.session_state["analyze_results"] = result_df
+                except Exception as e:
+                    progress_box.update(label="Failed", state="error")
+                    st.exception(e)
+
+    if "analyze_results" in st.session_state:
+        result_df = st.session_state["analyze_results"]
+        n_total_r = len(result_df)
+        n_flag_r = int((result_df["is_anomaly"] == "Yes").sum())
+
+        r1, r2, r3 = st.columns(3)
+        r1.markdown(f"<div class='card'><div class='kpi-label'>Wallets analyzed</div><div class='kpi-value'>{n_total_r:,}</div></div>", unsafe_allow_html=True)
+        r2.markdown(f"<div class='card'><div class='kpi-label'>Flagged</div><div class='kpi-value'>{n_flag_r:,}</div></div>", unsafe_allow_html=True)
+        r3.markdown(f"<div class='card'><div class='kpi-label'>Flag rate</div><div class='kpi-value'>{round(n_flag_r/n_total_r*100,1) if n_total_r else 0}%</div></div>", unsafe_allow_html=True)
+
+        st.write("")
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("<div class='card-title'>Results</div>", unsafe_allow_html=True)
+        show_cols = [c for c in ["rank", "wallet", "confidence_pct", "risk_level", "reason"] if c in result_df.columns]
+        st.dataframe(result_df[show_cols], use_container_width=True, height=460)
+        st.download_button(
+            "Download full results as CSV",
+            result_df.to_csv(index=False).encode("utf-8"),
+            "analyzed_wallets.csv", "text/csv",
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
